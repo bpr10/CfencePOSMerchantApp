@@ -1,0 +1,21 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.stampitgo.android.AboutUs" >
+
+    <item
+        android:id="@+id/action_change_password"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="Chanage Password"/>
+        <item
+        android:id="@+id/action_change_mobile"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="Chanage Mobile-No."/>
+		<item
+        android:id="@+id/action_logout"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="Logout"/>
+</menu>
