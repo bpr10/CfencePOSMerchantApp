@@ -4,8 +4,8 @@
     <string name="app_name">Online Merchant Web Page</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_home">Home</string>
-    <string name="title_activity_poshome">POS Home</string>
+    <string name="title_activity_home">XYZ Gizmos</string>
+    <string name="title_activity_poshome">XYZ Gizmos</string>
     <string name="title_activity_card_details">Card Details</string>
     <string name="sms_text">Your OTP For the current Transaction is</string>
     <string name="enter_otp">Please Enter the OTP sent to your Registered Mobile no</string>
