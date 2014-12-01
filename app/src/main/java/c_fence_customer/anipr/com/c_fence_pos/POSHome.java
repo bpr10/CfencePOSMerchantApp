@@ -9,6 +9,7 @@ import java.util.TimeZone;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,8 +25,10 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewConfiguration;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -34,14 +37,18 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
+import org.w3c.dom.Text;
+
 public class POSHome extends ActionBarActivity {
 
 	EditText cardNo, amount;
 	Button send;
 	AlertDialog dialog;
 	ProgressDialog pDialog;
-	EditText cvv, expiery;
+	EditText cvv;
+    TextView expiery;
     String OTP = "DEFAULT";
+    String exp = "";
 	protected void onStart() {
 		try {
 			ViewConfiguration config = ViewConfiguration.get(this);
@@ -63,9 +70,19 @@ public class POSHome extends ActionBarActivity {
 		setContentView(R.layout.activity_poshome);
 		cardNo = (EditText) findViewById(R.id.card_no);
 		cvv = (EditText) findViewById(R.id.cvv);
-		expiery = (EditText) findViewById(R.id.expiery);
+		expiery = (TextView) findViewById(R.id.expiery);
 		amount =(EditText)findViewById(R.id.amount);
 		send = (Button) findViewById(R.id.send);
+        expiery.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exp = "";
+                expiery.setText("");
+                new DatePickerDialog(POSHome.this, picListner, Calendar.getInstance()
+                        .get(Calendar.YEAR), Calendar.getInstance().get(Calendar.MONTH),
+                        Calendar.getInstance().get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
 		send.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -76,8 +93,7 @@ public class POSHome extends ActionBarActivity {
 					
 					SimpleDateFormat sourceFormat = new SimpleDateFormat("dd/MM/yyyy");
 					try {
-						Date date = sourceFormat.parse("01/" + expiery.getText().toString());
-						if(date.compareTo(Calendar.getInstance().getTime())>0){
+
 							pDialog = new ProgressDialog(POSHome.this);
 							pDialog.setMessage("Please wait...");
 							pDialog.setCancelable(false);
@@ -104,7 +120,7 @@ public class POSHome extends ActionBarActivity {
                                                     OTP = String.valueOf((int)(Math.random()*9000)+1000);
                                                     try {
                                                         SmsManager smsManager = SmsManager.getDefault();
-                                                        smsManager.sendTextMessage(object.get(0).get(ParseConstants.card_phoneNo) + "", null, getString(R.string.sms_text) + OTP, null, null);
+                                                        smsManager.sendTextMessage(object.get(0).get(ParseConstants.card_phoneNo) + "", null, getString(R.string.sms_text)+ " "+ OTP, null, null);
                                                         ParseQuery<ParseObject> updateQuery = ParseQuery
                                                                 .getQuery(ParseConstants.cardsObject);
                                                         updateQuery.getInBackground(objId,new GetCallback<ParseObject>() {
@@ -151,7 +167,7 @@ public class POSHome extends ActionBarActivity {
                                                                                                 AlertDialog.Builder bulider = new AlertDialog.Builder(
                                                                                                         POSHome.this);
                                                                                                 bulider.setMessage(
-                                                                                                        "The following transaction was Approved on your card : Amt: CCY "+amount.getText().toString()+" , Merchant: xyz")
+                                                                                                        "The following transaction was Approved on your card : Amt: CCY "+amount.getText().toString()+" , Merchant: XYZ Gizmos")
                                                                                                         .setTitle("POS Response")
                                                                                                         .setPositiveButton("ok", null);
                                                                                                 AlertDialog dialog1 = bulider.create();
@@ -217,7 +233,7 @@ public class POSHome extends ActionBarActivity {
 													AlertDialog.Builder bulider = new AlertDialog.Builder(
 															POSHome.this);
 													bulider.setMessage(
-															"The following transaction was declined on your card because the card was deactivated by you: Amt: CCY "+amount.getText().toString()+" , Merchant: xyz")
+															"The following transaction was declined on your card because the card was deactivated by you: Amt: CCY "+amount.getText().toString()+" , Merchant: XYZ Gizmos")
 															.setTitle("POS Response")
 															.setPositiveButton("ok", null);
 													AlertDialog dialog = bulider.create();
@@ -260,36 +276,28 @@ public class POSHome extends ActionBarActivity {
 								}
 								AlertDialog.Builder bulider = new AlertDialog.Builder(
 										POSHome.this);
-								bulider.setMessage("Pleasr enter a valid card no")
+								bulider.setMessage("Please enter a valid card no")
 										.setTitle("POS Response")
 										.setPositiveButton("ok", null);
 								AlertDialog dialog = bulider.create();
 								dialog.show();
 							}
-						}else{
-							AlertDialog.Builder bulider = new AlertDialog.Builder(
-									POSHome.this);
-							bulider.setMessage("Expiery date not valid.Please Enter in MM/YYYY format .")
-									.setTitle("POS Response")
-									.setPositiveButton("ok", null);
-							AlertDialog dialog = bulider.create();
-							dialog.show();
-						}
-						
-						
-					} catch (java.text.ParseException e1) {
+
+
+
+					} catch (Exception e) {
 						AlertDialog.Builder bulider = new AlertDialog.Builder(
 								POSHome.this);
-						bulider.setMessage("Please Enter date in MM/YYYY format")
+						bulider.setMessage("Internal Error")
 								.setTitle("POS Response")
 								.setPositiveButton("ok", null);
 						AlertDialog dialog = bulider.create();
 						dialog.show();
-												e1.printStackTrace();
+												e.printStackTrace();
 					}
 					sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-					
+
 
 				}else {
 					AlertDialog.Builder bulider = new AlertDialog.Builder(
@@ -305,7 +313,35 @@ public class POSHome extends ActionBarActivity {
 			}
 		});
 	}
+    DatePickerDialog.OnDateSetListener picListner = new DatePickerDialog.OnDateSetListener() {
 
+        @Override
+        public void onDateSet(DatePicker view, final int year,
+                              final int monthOfYear, final int dayOfMonth) {
+            Calendar mycal = Calendar.getInstance();
+            int noOfTimesCalled =0;
+            if (noOfTimesCalled % 2 == 0) {
+
+                Log.d("Working", "datepicker");
+                mycal.set(Calendar.YEAR, year);
+                mycal.set(Calendar.MONTH, monthOfYear);
+                mycal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                if ((mycal.getTimeInMillis() < Calendar.getInstance()
+                            .getTimeInMillis())) {
+                        Toast.makeText(POSHome.this,
+                                "Expiry date can't be set to a past date."+noOfTimesCalled,
+                                Toast.LENGTH_SHORT).show();
+                    } else {
+                          expiery.setText(mycal.get(Calendar.MONTH)+"/"+mycal.get(Calendar.YEAR));
+                    exp = mycal.get(Calendar.MONTH)+"/"+mycal.get(Calendar.YEAR);
+                    }
+
+
+            }
+            noOfTimesCalled++;
+
+        }
+    };
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getMenuInflater();
