@@ -28,21 +28,34 @@ public class MainActivity extends ActionBarActivity {
 			
 			@Override
 			public void onClick(View v) {
-				if((mobileNo.getText().toString().equals("pos"))&&(otp.getText().toString().equals("pos"))){
-					Intent i = new Intent(MainActivity.this,POSHome.class);
-					startActivity(i);
-				}
-			
-				else{
-					AlertDialog.Builder bulider = new AlertDialog.Builder(
-							MainActivity.this);
-					bulider.setMessage(
-							"Invalid Credentials")
-							.setTitle("POS Response")
-							.setPositiveButton("ok", null);
-					AlertDialog dialog = bulider.create();
-					dialog.show();
-				}
+                if(new ComUtility().isConnectingToInternet(getApplicationContext())){
+                    if((mobileNo.getText().toString().equals("pos"))&&(otp.getText().toString().equals("pos"))){
+                        Intent i = new Intent(MainActivity.this,POSHome.class);
+                        startActivity(i);
+                    }
+
+                    else{
+                        AlertDialog.Builder bulider = new AlertDialog.Builder(
+                                MainActivity.this);
+                        bulider.setMessage(
+                                "Invalid Credentials")
+                                .setTitle("POS Response")
+                                .setPositiveButton("ok", null);
+                        AlertDialog dialog = bulider.create();
+                        dialog.show();
+                    }
+                }else{
+                    AlertDialog.Builder bulider = new AlertDialog.Builder(
+                            MainActivity.this);
+                    bulider.setMessage(
+                            "Internet Connection not Found.")
+                            .setTitle("Response")
+                            .setPositiveButton("ok", null);
+                    AlertDialog dialog = bulider.create();
+                    dialog.show();
+                }
+
+
 			}
 		});
 		
