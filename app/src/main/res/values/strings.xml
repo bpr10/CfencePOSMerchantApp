@@ -9,5 +9,6 @@
     <string name="title_activity_card_details">Card Details</string>
     <string name="sms_text">Your OTP For the current Transaction is </string>
     <string name="enter_otp">Please Enter the OTP sent to your Registered Mobile no</string>
-
+    <string name="trans_declined">Transaction declined because you have switched off your card.</string>
+    <string name="trans_approved">Transaction approved</string>
 </resources>
