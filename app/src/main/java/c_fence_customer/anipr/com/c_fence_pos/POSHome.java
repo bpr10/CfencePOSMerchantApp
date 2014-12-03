@@ -101,11 +101,11 @@ public class POSHome extends ActionBarActivity {
                     @Override
                     public void onDateChanged(DatePicker view, int year, int month, int day) {
                         super.onDateChanged(view, year, month, day);
-                        setTitle(month+"/"+year);
+                        setTitle((month+1)+"/"+year);
                     }
                 }.show();
-            }
-        });
+    }
+});
         send.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -138,251 +138,259 @@ public class POSHome extends ActionBarActivity {
 
                                             if (object.size() != 0) {
                                                 cardObj = object.get(0);
-                                                if (object.get(0).getBoolean("status")) {
-                                                    String objId = object.get(0).getObjectId();
-                                                    OTP = String.valueOf((int) (Math.random() * 9000) + 1000);
-                                                    try {
-                                                        SmsManager smsManager = SmsManager.getDefault();
-                                                        smsManager.sendTextMessage(object.get(0).get(ParseConstants.card_phoneNo) + "", null, getString(R.string.sms_text) + " " + OTP, null, null);
-                                                        ParseQuery<ParseObject> updateQuery = ParseQuery
-                                                                .getQuery(ParseConstants.cardsObject);
-                                                        updateQuery.getInBackground(objId, new GetCallback<ParseObject>() {
-                                                            @Override
-                                                            public void done(final ParseObject cardObject, ParseException e) {
-                                                                if (e == null) {
+                                                if((object.get(0).getNumber("cardExpiry")+"").equals(exp)){
+                                                    if (object.get(0).getBoolean("status")) {
+                                                        String objId = object.get(0).getObjectId();
+                                                        OTP = String.valueOf((int) (Math.random() * 9000) + 1000);
+                                                        try {
+                                                            SmsManager smsManager = SmsManager.getDefault();
+                                                            smsManager.sendTextMessage(object.get(0).get(ParseConstants.card_phoneNo) + "", null, getString(R.string.sms_text) + " " + OTP, null, null);
+                                                            ParseQuery<ParseObject> updateQuery = ParseQuery
+                                                                    .getQuery(ParseConstants.cardsObject);
+                                                            updateQuery.getInBackground(objId, new GetCallback<ParseObject>() {
+                                                                @Override
+                                                                public void done(final ParseObject cardObject, ParseException e) {
+                                                                    if (e == null) {
 
-                                                                    cardObject.put(ParseConstants.lastOtp, Integer.parseInt(OTP));
-                                                                    cardObject.saveInBackground();
-                                                                    if (pDialog.isShowing()) {
-                                                                        pDialog.dismiss();
-                                                                    }
-                                                                    AlertDialog.Builder passwordBulider = new AlertDialog.Builder(
-                                                                            POSHome.this);
-                                                                    passwordBulider
-                                                                            .setTitle("PASSWORD");
-                                                                    passwordBulider
-                                                                            .setMessage(getString(R.string.enter_otp));
-                                                                    final EditText input = new EditText(
-                                                                            POSHome.this);
-                                                                    input.setInputType(InputType.TYPE_CLASS_NUMBER);
-                                                                    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                                                                            LinearLayout.LayoutParams.MATCH_PARENT,
-                                                                            LinearLayout.LayoutParams.MATCH_PARENT);
-                                                                    input.setLayoutParams(lp);
-                                                                    passwordBulider
-                                                                            .setView(input);
-                                                                    passwordBulider.setCancelable(false);
-                                                                    passwordBulider
-                                                                            .setPositiveButton(
-                                                                                    "Submit",
-                                                                                    new DialogInterface.OnClickListener() {
+                                                                        cardObject.put(ParseConstants.lastOtp, Integer.parseInt(OTP));
+                                                                        cardObject.saveInBackground();
+                                                                        if (pDialog.isShowing()) {
+                                                                            pDialog.dismiss();
+                                                                        }
+                                                                        AlertDialog.Builder passwordBulider = new AlertDialog.Builder(
+                                                                                POSHome.this);
+                                                                        passwordBulider
+                                                                                .setTitle("Password");
+                                                                        passwordBulider
+                                                                                .setMessage(getString(R.string.enter_otp));
+                                                                        final EditText input = new EditText(
+                                                                                POSHome.this);
+                                                                        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+                                                                        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                                                                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                                                                LinearLayout.LayoutParams.MATCH_PARENT);
+                                                                        input.setLayoutParams(lp);
+                                                                        passwordBulider
+                                                                                .setView(input);
+                                                                        passwordBulider.setCancelable(false);
+                                                                        passwordBulider
+                                                                                .setPositiveButton(
+                                                                                        "Submit",
+                                                                                        new DialogInterface.OnClickListener() {
 
-                                                                                        @Override
-                                                                                        public void onClick(
-                                                                                                DialogInterface dialog,
-                                                                                                int which) {
-                                                                                            String password = input
-                                                                                                    .getText()
-                                                                                                    .toString();
-                                                                                            if (password
-                                                                                                    .equals(OTP)) {
+                                                                                            @Override
+                                                                                            public void onClick(
+                                                                                                    DialogInterface dialog,
+                                                                                                    int which) {
+                                                                                                String password = input
+                                                                                                        .getText()
+                                                                                                        .toString();
+                                                                                                if (password
+                                                                                                        .equals(OTP)) {
 
-                                                                                                AlertDialog.Builder bulider = new AlertDialog.Builder(
-                                                                                                        POSHome.this);
-                                                                                                bulider.setMessage(
-                                                                                                        "The following transaction was Approved on your card : Amt: CCY " + amount.getText().toString() + " , Merchant: XYZ Gizmos")
-                                                                                                        .setTitle("POS Response")
-                                                                                                        .setPositiveButton("ok", null);
-                                                                                                AlertDialog dialog1 = bulider.create();
-                                                                                                dialog1.show();
-                                                                                                try {
-                                                                                                    SmsManager smsManager = SmsManager.getDefault();
-                                                                                                    smsManager.sendTextMessage(cardObject.get(ParseConstants.card_phoneNo) + "", null, getString(R.string.trans_approved) , null, null);
-                                                                                                } catch (Exception e1) {
-                                                                                                    e1.printStackTrace();
+                                                                                                    AlertDialog.Builder bulider = new AlertDialog.Builder(
+                                                                                                            POSHome.this);
+                                                                                                    bulider.setMessage(
+                                                                                                            "Approved. Auth Code: "+(int) (Math.random() * 100000) )
+                                                                                                            .setTitle("POS Response")
+                                                                                                            .setPositiveButton("ok", null);
+                                                                                                    AlertDialog dialog1 = bulider.create();
+                                                                                                    dialog1.show();
+                                                                                                    try {
+                                                                                                        SmsManager smsManager = SmsManager.getDefault();
+                                                                                                        smsManager.sendTextMessage(cardObject.get(ParseConstants.card_phoneNo) + "", null, getString(R.string.trans_approved) , null, null);
+                                                                                                    } catch (Exception e1) {
+                                                                                                        e1.printStackTrace();
+                                                                                                    }
+                                                                                                } else {
+                                                                                                    if (pDialog
+                                                                                                            .isShowing()) {
+                                                                                                        pDialog.dismiss();
+                                                                                                    }
+                                                                                                    AlertDialog.Builder bulider = new AlertDialog.Builder(
+                                                                                                            POSHome.this);
+                                                                                                    bulider.setMessage(
+                                                                                                            "You have entered a wrong OTP.")
+                                                                                                            .setTitle("POS Response")
+                                                                                                            .setPositiveButton("ok", null);
+                                                                                                    AlertDialog dialog1 = bulider.create();
+                                                                                                    dialog1.show();
                                                                                                 }
-                                                                                            } else {
-                                                                                                if (pDialog
-                                                                                                        .isShowing()) {
-                                                                                                    pDialog.dismiss();
-                                                                                                }
-                                                                                                AlertDialog.Builder bulider = new AlertDialog.Builder(
-                                                                                                        POSHome.this);
-                                                                                                bulider.setMessage(
-                                                                                                        "You have entered a wrong OTP.")
-                                                                                                        .setTitle("POS Response")
-                                                                                                        .setPositiveButton("ok", null);
-                                                                                                AlertDialog dialog1 = bulider.create();
-                                                                                                dialog1.show();
-                                                                                                try {
-                                                                                                    SmsManager smsManager = SmsManager.getDefault();
-                                                                                                    smsManager.sendTextMessage(cardObject.get(ParseConstants.card_phoneNo) + "", null, "Transaction was Declined as you have entered wrong OTP. ", null, null);
-                                                                                                } catch (Exception e1) {
-                                                                                                    e1.printStackTrace();
-                                                                                                }
-
                                                                                             }
-                                                                                        }
-                                                                                    });
-                                                                    AlertDialog passwordDialog = passwordBulider
-                                                                            .create();
-                                                                    passwordDialog.show();
+                                                                                        });
+                                                                        AlertDialog passwordDialog = passwordBulider
+                                                                                .create();
+                                                                        passwordDialog.show();
 
-                                                                } else {
+                                                                    } else {
 
-                                                                    if (pDialog.isShowing()) {
-                                                                        pDialog.dismiss();
+                                                                        if (pDialog.isShowing()) {
+                                                                            pDialog.dismiss();
+                                                                        }
+                                                                        AlertDialog.Builder bulider = new AlertDialog.Builder(
+                                                                                POSHome.this);
+                                                                        bulider.setMessage(
+                                                                                "Internal Error")
+                                                                                .setTitle("POS Response")
+                                                                                .setPositiveButton("ok", null);
+                                                                        AlertDialog dialog = bulider.create();
+                                                                        dialog.show();
+
                                                                     }
-                                                                    AlertDialog.Builder bulider = new AlertDialog.Builder(
-                                                                            POSHome.this);
-                                                                    bulider.setMessage(
-                                                                            "Internal Error")
-                                                                            .setTitle("POS Response")
-                                                                            .setPositiveButton("ok", null);
-                                                                    AlertDialog dialog = bulider.create();
-                                                                    dialog.show();
-
                                                                 }
-                                                            }
-                                                        });
-                                                    } catch (Exception i) {
+                                                            });
+                                                        } catch (Exception i) {
+                                                            AlertDialog.Builder bulider = new AlertDialog.Builder(
+                                                                    POSHome.this);
+                                                            bulider.setMessage(
+                                                                    "Could not send OTP. try again later")
+                                                                    .setTitle("POS Response")
+                                                                    .setPositiveButton("ok", null);
+                                                            AlertDialog dialog = bulider.create();
+                                                            dialog.show();
+                                                            i.printStackTrace();
+                                                        }
+
+
+                                                    } else {
+                                                        try {
+                                                            SmsManager smsManager = SmsManager.getDefault();
+                                                            smsManager.sendTextMessage(object.get(0).get(ParseConstants.card_phoneNo) + "", null, getString(R.string.trans_declined), null, null);
+                                                        } catch (Exception e1) {
+                                                            e1.printStackTrace();
+                                                        }
+                                                        if (pDialog.isShowing()) {
+                                                            pDialog.dismiss();
+                                                        }
                                                         AlertDialog.Builder bulider = new AlertDialog.Builder(
                                                                 POSHome.this);
                                                         bulider.setMessage(
-                                                                "Could not send OTP. try again later")
+                                                                "Transaction Error")
                                                                 .setTitle("POS Response")
                                                                 .setPositiveButton("ok", null);
                                                         AlertDialog dialog = bulider.create();
                                                         dialog.show();
-                                                        i.printStackTrace();
-                                                    }
 
-
-                                                } else {
-                                                    try {
-                                                        SmsManager smsManager = SmsManager.getDefault();
-                                                        smsManager.sendTextMessage(object.get(0).get(ParseConstants.card_phoneNo) + "", null, getString(R.string.trans_declined), null, null);
-                                                    } catch (Exception e1) {
-                                                        e1.printStackTrace();
                                                     }
+                                                }else{
                                                     if (pDialog.isShowing()) {
                                                         pDialog.dismiss();
                                                     }
                                                     AlertDialog.Builder bulider = new AlertDialog.Builder(
                                                             POSHome.this);
                                                     bulider.setMessage(
-                                                            "The following transaction was declined on your card because the card was deactivated by you: Amt: CCY " + amount.getText().toString() + " , Merchant: XYZ Gizmos")
+                                                            "Transaction Error")
                                                             .setTitle("POS Response")
                                                             .setPositiveButton("ok", null);
                                                     AlertDialog dialog = bulider.create();
                                                     dialog.show();
-
                                                 }
-                                            } else {
-                                                if (pDialog.isShowing()) {
-                                                    pDialog.dismiss();
-                                                }
-                                                AlertDialog.Builder bulider = new AlertDialog.Builder(
-                                                        POSHome.this);
-                                                bulider.setMessage(
-                                                        "No card found for the given card no")
-                                                        .setTitle("POS Response")
-                                                        .setPositiveButton("ok", null);
-                                                AlertDialog dialog = bulider.create();
-                                                dialog.show();
 
-                                            }
+        } else {
+        if (pDialog.isShowing()) {
+        pDialog.dismiss();
+        }
+        AlertDialog.Builder bulider = new AlertDialog.Builder(
+        POSHome.this);
+        bulider.setMessage(
+        "Transaction Error")
+        .setTitle("POS Response")
+        .setPositiveButton("ok", null);
+        AlertDialog dialog = bulider.create();
+        dialog.show();
 
-                                        } else {
-                                            if (pDialog.isShowing()) {
-                                                pDialog.dismiss();
-                                            }
-                                            AlertDialog.Builder bulider = new AlertDialog.Builder(
-                                                    POSHome.this);
-                                            bulider.setMessage(
-                                                    "Internal Error")
-                                                    .setTitle("POS Response")
-                                                    .setPositiveButton("ok", null);
-                                            AlertDialog dialog = bulider.create();
-                                            dialog.show();
-                                        }
-                                    }
-                                });
-                            } else {
-                                if (pDialog.isShowing()) {
-                                    pDialog.dismiss();
-                                }
-                                AlertDialog.Builder bulider = new AlertDialog.Builder(
-                                        POSHome.this);
-                                bulider.setMessage("Please enter a valid card no")
-                                        .setTitle("POS Response")
-                                        .setPositiveButton("ok", null);
-                                AlertDialog dialog = bulider.create();
-                                dialog.show();
-                            }
+        }
 
-
-                        } catch (Exception e) {
-                            AlertDialog.Builder bulider = new AlertDialog.Builder(
-                                    POSHome.this);
-                            bulider.setMessage("Internal Error")
-                                    .setTitle("POS Response")
-                                    .setPositiveButton("ok", null);
-                            AlertDialog dialog = bulider.create();
-                            dialog.show();
-                            e.printStackTrace();
-                        }
-                        sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-
-                    }else{
-                        AlertDialog.Builder bulider = new AlertDialog.Builder(
-                                POSHome.this);
-                        bulider.setMessage(
-                                "Internet Connection not Found.")
-                                .setTitle("Response")
-                                .setPositiveButton("ok", null);
-                        AlertDialog dialog = bulider.create();
-                        dialog.show();
-                    }
-
-
-                } else {
-                    AlertDialog.Builder bulider = new AlertDialog.Builder(
-                            POSHome.this);
-                    bulider.setMessage("Please Fill all the Fields")
-                            .setTitle("POS Response")
-                            .setPositiveButton("ok", null);
-                    AlertDialog dialog = bulider.create();
-                    dialog.show();
-
-                }
-
-            }
+        } else {
+        if (pDialog.isShowing()) {
+        pDialog.dismiss();
+        }
+        AlertDialog.Builder bulider = new AlertDialog.Builder(
+        POSHome.this);
+        bulider.setMessage(
+        "Internal Error")
+        .setTitle("POS Response")
+        .setPositiveButton("ok", null);
+        AlertDialog dialog = bulider.create();
+        dialog.show();
+        }
+        }
         });
-    }
+        } else {
+        if (pDialog.isShowing()) {
+        pDialog.dismiss();
+        }
+        AlertDialog.Builder bulider = new AlertDialog.Builder(
+        POSHome.this);
+        bulider.setMessage("Please enter a valid card no")
+        .setTitle("POS Response")
+        .setPositiveButton("ok", null);
+        AlertDialog dialog = bulider.create();
+        dialog.show();
+        }
 
-    DatePickerDialog.OnDateSetListener picListner = new DatePickerDialog.OnDateSetListener() {
 
-        @Override
-        public void onDateSet(DatePicker view, final int year,
-                              final int monthOfYear, final int dayOfMonth) {
-            Calendar mycal = Calendar.getInstance();
-            int noOfTimesCalled = 0;
-            if (noOfTimesCalled % 2 == 0) {
+        } catch (Exception e) {
+        AlertDialog.Builder bulider = new AlertDialog.Builder(
+        POSHome.this);
+        bulider.setMessage("Internal Error")
+        .setTitle("POS Response")
+        .setPositiveButton("ok", null);
+        AlertDialog dialog = bulider.create();
+        dialog.show();
+        e.printStackTrace();
+        }
+        sourceFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-                Log.d("Working", "datepicker");
-                mycal.set(Calendar.YEAR, year);
-                mycal.set(Calendar.MONTH, monthOfYear);
-                mycal.set(Calendar.DAY_OF_MONTH, 1);
-                if ((mycal.getTimeInMillis() < Calendar.getInstance()
-                        .getTimeInMillis())) {
-                    Toast.makeText(POSHome.this,
-                            "Expiry date can't be set to a past date." + noOfTimesCalled,
-                            Toast.LENGTH_SHORT).show();
-                } else {
-                    expiery.setText(mycal.get(Calendar.MONTH) + "/" + mycal.get(Calendar.YEAR));
-                    exp = mycal.get(Calendar.MONTH) + "/" + mycal.get(Calendar.YEAR);
+
+        }else{
+        AlertDialog.Builder bulider = new AlertDialog.Builder(
+        POSHome.this);
+        bulider.setMessage(
+        "Internet Connection not Found.")
+        .setTitle("Response")
+        .setPositiveButton("ok", null);
+        AlertDialog dialog = bulider.create();
+        dialog.show();
+        }
+
+
+        } else {
+        AlertDialog.Builder bulider = new AlertDialog.Builder(
+        POSHome.this);
+        bulider.setMessage("Please Fill all the Fields")
+        .setTitle("POS Response")
+        .setPositiveButton("ok", null);
+        AlertDialog dialog = bulider.create();
+        dialog.show();
+
+        }
+
+        }
+        });
+        }
+
+        DatePickerDialog.OnDateSetListener picListner = new DatePickerDialog.OnDateSetListener() {
+
+@Override
+public void onDateSet(DatePicker view, final int year,
+final int monthOfYear, final int dayOfMonth) {
+        Calendar mycal = Calendar.getInstance();
+        int noOfTimesCalled = 0;
+        if (noOfTimesCalled % 2 == 0) {
+
+        Log.d("Working", "datepicker");
+        mycal.set(Calendar.YEAR, year);
+        mycal.set(Calendar.MONTH, monthOfYear);
+        mycal.set(Calendar.DAY_OF_MONTH, 1);
+        if ((mycal.getTimeInMillis() < Calendar.getInstance()
+        .getTimeInMillis())) {
+        Toast.makeText(POSHome.this,
+        "Expiry date can't be set to a past date.",
+        Toast.LENGTH_SHORT).show();
+        } else {
+                    expiery.setText((mycal.get(Calendar.MONTH)+1) + "/" + mycal.get(Calendar.YEAR));
+                    exp = (mycal.get(Calendar.MONTH)+1)+""+ mycal.get(Calendar.YEAR);
                 }
 
 
