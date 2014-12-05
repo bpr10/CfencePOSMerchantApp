@@ -5,6 +5,6 @@ public class ParseConstants {
 	public static String user = "user";
 	protected static String cardNumber = "cardNumber";
 	protected static String status = "status";
-    protected static String card_phoneNo = "mobile";
+    protected static String card_phoneNo = "phoneno";
     protected static String lastOtp = "lastOtp";
 }
